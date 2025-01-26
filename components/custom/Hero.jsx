@@ -5,11 +5,16 @@ import { UserDetailContext } from '@/context/UserDetailcontext';
 import { ArrowRight, Link } from 'lucide-react';
 import React, { useContext, useState } from 'react';
 import LoginDialog from './LoginDialog';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { useRouter } from 'next/navigation';
+
 
 const Hero = () => {
     const [userInput, setUserInput] = useState('');
     const { messages, setMessages } = useContext(MessagesContext);
     const [open, setOpen] = useState(false);
+    const CreateWorkspace = useMutation(api.workspace.CreateWorkspace);
     const suggestions = [
         'Create TODO App in React',
         'Create Budget Track App',
@@ -18,19 +23,24 @@ const Hero = () => {
         'Create Login Signup Screen',
     ];
     const { userDetail } = useContext(UserDetailContext);
-
-    const onGenerate = (input) => {
+    const router = useRouter();
+    const onGenerate = async (input) => {
         if (!userDetail?.name) {
             setOpen(true);
             return;
         }
-        setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-                role: 'user',
-                content: input,
-            },
-        ]);
+        const msg = {
+            role : 'user',
+            content: input,
+            
+        }
+        setMessages(msg);
+        const  workspaceId = await CreateWorkspace({
+            user:userDetail?._id,
+            messages: [msg],
+        });
+        console.log('Workspace created with id:', workspaceId);
+        router.push(`/workspace/${workspaceId}`);
     };
 
     const handleSuggestionClick = (suggestion) => {
@@ -44,7 +54,7 @@ const Hero = () => {
                 Prompt, run, edit, and deploy full-stack web apps.
             </p>
 
-            <div className="p-5 border border-gray-700 rounded-xl max-w-xl w-full mt-3 bg-[#141414] shadow-lg">
+            <div className="p-5 border border-[#ED9030] rounded-xl max-w-xl w-full mt-3 bg-[#141414] shadow-lg">
                 <div className="flex gap-2">
                     <textarea
                         placeholder="What do you want to build?"
