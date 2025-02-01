@@ -5,6 +5,7 @@ import { UserDetailContext } from '@/context/UserDetailcontext';
 import { api } from '@/convex/_generated/api';
 import Prompt from '@/data/Prompt';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 
 import { useConvex, useMutation } from 'convex/react';
 import { ArrowRight, Link, Loader2Icon } from 'lucide-react';
@@ -13,11 +14,11 @@ import { useParams } from 'next/navigation';
 import React, { useContext, useEffect, useState } from 'react';
 
 const ChatView = () => {
-    const { id } = useParams(); // Get workspace ID from route params
+    const { id } = useParams();
     const convex = useConvex();
     const [userInput, setUserInput] = useState('');
     const { userDetail } = useContext(UserDetailContext);
-    const { messages, setMessages } = useContext(MessagesContext); // Assuming MessagesContext is available in the parent component
+    const { messages, setMessages } = useContext(MessagesContext);
     const [loading, setLoading] = useState(false);
     const UpdateMessages = useMutation(api.workspace.UpdateMessages);
 
@@ -27,7 +28,7 @@ const ChatView = () => {
             const result = await convex.query(api.workspace.GetWorkspace, {
                 workspaceId: id,
             });
-            setMessages(Array.isArray(result.messages) ? result.messages : []); // Ensure messages is an array
+            setMessages(Array.isArray(result.messages) ? result.messages : []);
             console.log("Workspace Data:", result);
         } catch (error) {
             console.error("Error fetching workspace data:", error);
@@ -75,10 +76,13 @@ const ChatView = () => {
         <div className='relative h-[85vh] flex flex-col'>
             <div className='flex-1 overflow-y-scroll no-scrollbar'>
                 {Array.isArray(messages) && messages.map((msg, index) => (
-                    <div key={index}
-                        className='p-3 rounded-lg mb-2 bg-[#222222] flex gap-2 items-start'>
+                    <div key={index} className='p-3 rounded-lg mb-2 bg-[#222222] flex gap-2 items-start'>
                         {msg?.role === 'user' && <Image src={userDetail?.picture} alt="User" width={35} height={35} className='rounded-full' />}
-                        <h2>{msg.content}</h2>
+                        {msg?.role === 'assistant' ? (
+                            <ReactMarkdown className="prose prose-invert text-gray-300">{msg.content}</ReactMarkdown>
+                        ) : (
+                            <h2 className="text-gray-300">{msg.content}</h2>
+                        )}
                     </div>
                 ))}
                 {loading && (
@@ -111,6 +115,6 @@ const ChatView = () => {
             </div>
         </div>
     );
-};
+};  
 
 export default ChatView;
