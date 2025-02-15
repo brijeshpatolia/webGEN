@@ -1,0 +1,11 @@
+{
+    "functions": {
+      "app/api/gen-ai-code/route.js": {
+        "maxDuration": 30
+      },
+      "app/api/ai-chat/route.js": {
+        "maxDuration": 30
+      }
+    }
+  }
+  
