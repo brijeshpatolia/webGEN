@@ -18,8 +18,8 @@ const generationConfig = {
 // Configuration for code generation/completion (currently the same as chat configuration)
 const codeGenerationConfig = {
   model: "gpt-4o-mini",
-  temperature: 0.7,
-  max_tokens: 800,
+  temperature: 1,
+  max_tokens: 1500,
   top_p: 0.95,
   frequency_penalty: 0,
   presence_penalty: 0,
